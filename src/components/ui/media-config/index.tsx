@@ -3,10 +3,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useLocalMediaContext } from '@/contexts/local-media-context'
-import React from 'react'
+import useStage from '@/hooks/use-stage'
+import React, { useState } from 'react'
 
 function MediaConfig() {
   const { audioDevices, videoDevices } = useLocalMediaContext()
+  const { leaveStage, joinStage, stageJoined, screenshareStageJoined, unpublishScreenshare, publishScreenshare } = useStage()
+  const [stageToken, setStageToken] = useState('')
+  const [screenshareToken, setScreenshareToken] = useState('')
 
   function joinOrLeaveStage() {
     if (stageJoined) {
@@ -30,7 +34,7 @@ function MediaConfig() {
         <div className="flex flex-col gap-2 justify-end">
           <Label>Token</Label>
           <div>
-            <Input />
+            <Input type="text" value={stageToken} onChange={(e) => setStageToken(e.target.value)} id="token" name="token" />
           </div>
         </div>
         <div className="flex flex-col gap-2 justify-end">
@@ -41,7 +45,7 @@ function MediaConfig() {
         <div className="flex flex-col gap-2 justify-end">
           <Label>Screenshare Token</Label>
           <div>
-            <Input />
+            <Input type="text" id="screenshare-token" name="screenshare-token" value={screenshareToken} onChange={(e) => setScreenshareToken(e.target.value)} />
           </div>
         </div>
         <div className="flex flex-col gap-2 justify-end">

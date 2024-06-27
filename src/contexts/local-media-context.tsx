@@ -6,12 +6,6 @@ import { createContext, PropsWithChildren, useContext, useEffect, useState } fro
 const LocalMediaContext = createContext<LocalMediaContextType>({
   audioDevices: [],
   videoDevices: [],
-  currentVideoDevice: undefined,
-  currentAudioDevice: undefined,
-  screenshare: undefined,
-  updateLocalAudio: undefined,
-  updateLocalVideo: undefined,
-  updateScreenshare: undefined,
 })
 
 export const useLocalMediaContext = () => useContext(LocalMediaContext)

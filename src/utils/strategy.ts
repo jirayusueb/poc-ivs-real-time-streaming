@@ -1,17 +1,17 @@
-import { StageParticipantInfo, SubscribeType } from 'amazon-ivs-web-broadcast'
+import { LocalStageStream, StageParticipantInfo, SubscribeType } from 'amazon-ivs-web-broadcast'
 
 export default class Strategy {
   /**
    * The video stream to publish.
    * @type {MediaStream | undefined}
    */
-  private _videoStream?: MediaStream
+  private _videoStream?: LocalStageStream
 
   /**
    * The audio stream to publish.
    * @type {MediaStream | undefined}
    */
-  private _audioStream?: MediaStream
+  private _audioStream?: LocalStageStream
 
   /**
    * The type of streams to subscribe to.
@@ -22,11 +22,11 @@ export default class Strategy {
   /**
    * The class constructor.
    *
-   * @param {MediaStream | undefined} audioStream - The audio stream to publish.
-   * @param {MediaStream | undefined} videoStream - The video stream to publish.
+   * @param {LocalStageStream | undefined} audioStream - The audio stream to publish.
+   * @param {LocalStageStream | undefined} videoStream - The video stream to publish.
    * @param {SubscribeType} subscribeType - The type of streams to subscribe to. Defaults to SubscribeType.AUDIO_VIDEO.
    */
-  constructor(audioStream?: MediaStream, videoStream?: MediaStream, subscribeType: SubscribeType = SubscribeType.AUDIO_VIDEO) {
+  constructor(audioStream?: LocalStageStream, videoStream?: LocalStageStream, subscribeType: SubscribeType = SubscribeType.AUDIO_VIDEO) {
     this._videoStream = videoStream
     this._audioStream = audioStream
     this._subscribeType = subscribeType
@@ -35,20 +35,20 @@ export default class Strategy {
   /**
    * Update the media streams to publish.
    *
-   * @param {MediaStream | undefined} audioStream - The audio stream to publish.
-   * @param {MediaStream | undefined} videoStream - The video stream to publish.
+   * @param {LocalStageStream | undefined} audioStream - The audio stream to publish.
+   * @param {LocalStageStream | undefined} videoStream - The video stream to publish.
    */
-  updateMedia(audioStream?: MediaStream, videoStream?: MediaStream): void {
+  updateMedia(audioStream?: LocalStageStream, videoStream?: LocalStageStream): void {
     this._audioStream = audioStream
     this._videoStream = videoStream
   }
 
   /**
    * Stage the streams to publish.
-   * @returns {MediaStream[]} The array of streams to publish.
+   * @returns {LocalStageStream[]} The array of streams to publish.
    */
-  stageStreamsToPublish(): MediaStream[] {
-    const streams: MediaStream[] = []
+  stageStreamsToPublish(): LocalStageStream[] {
+    const streams: LocalStageStream[] = []
     if (this._videoStream) {
       streams.push(this._videoStream)
     }
