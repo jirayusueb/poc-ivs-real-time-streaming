@@ -1,12 +1,12 @@
-import { useLocalMediaContext } from '@/contexts/local-media-context.jsx'
-import { getScreenshare } from '@/utils/media-device.js'
-import Strategy from '@/utils/strategy.js'
+import { LocalMediaContext } from '@/contexts/local-media-context'
+import { getScreenshare } from '@/utils/media-device'
+import Strategy from '@/utils/strategy'
 import { Stage, StageConnectionState, StageEvents, SubscribeType } from 'amazon-ivs-web-broadcast'
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 
 export default function useScreenshareStage() {
   const [screenshareStageJoined, setScreenshareStageJoined] = useState(false)
-  const { screenshare, updateScreenshare } = useLocalMediaContext()
+  const { screenshare, updateScreenshare } = useContext(LocalMediaContext)
 
   const stageRef = useRef<Stage | undefined>(undefined)
   const strategyRef = useRef(new Strategy(undefined, undefined, SubscribeType.NONE))

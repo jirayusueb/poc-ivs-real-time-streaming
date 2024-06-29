@@ -1,9 +1,10 @@
 'use client'
 
+import MediaActions from '@/components/media-actions'
+import MediaControl from '@/components/media-controls'
+import MediaVideo from '@/components/media-video'
 import { Button } from '@/components/ui/button'
-import MediaConfig from '@/components/ui/media-config'
 import { LocalMediaProvider } from '@/contexts/local-media-context'
-import React from 'react'
 
 export default function page() {
   return (
@@ -19,15 +20,14 @@ export default function page() {
           </div>
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <div className="h-full aspect-video bg-black"></div>
+              <MediaVideo />
             </div>
             <div>
-              <MediaConfig />
+              <MediaControl />
             </div>
           </div>
-          <div className="flex gap-6">
-            <Button className="w-full">UNMUTE MIC</Button>
-            <Button className="w-full">SHOW CAMERA</Button>
+          <div>
+            <MediaActions />
           </div>
         </div>
       </div>

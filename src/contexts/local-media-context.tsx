@@ -3,7 +3,7 @@ import { getDevices } from '@/utils/media-device'
 import { LocalStageStream } from 'amazon-ivs-web-broadcast'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 
-const LocalMediaContext = createContext<LocalMediaContextType>({
+export const LocalMediaContext = createContext<LocalMediaContextType>({
   audioDevices: [],
   videoDevices: [],
 })

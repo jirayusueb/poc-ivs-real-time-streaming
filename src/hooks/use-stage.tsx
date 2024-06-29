@@ -1,20 +1,12 @@
-import { useEffect, useRef, useState } from 'react'
-import { Stage, StageConnectionState, StageEvents, StageParticipantInfo, SubscribeType } from 'amazon-ivs-web-broadcast'
-import { useLocalMediaContext } from '@/contexts/local-media-context.jsx'
+import { useLocalMediaContext } from '@/contexts/local-media-context'
 import Strategy from '@/utils/strategy'
+import { Stage, StageConnectionState, StageEvents, StageParticipantInfo, StageStream } from 'amazon-ivs-web-broadcast'
+import { useEffect, useRef, useState } from 'react'
 
-/**
- * Custom hook that manages the connection to an IVS Stage.
- * @returns An object with the following properties:
- * - joinStage: A function to join an IVS Stage.
- * - stageJoined: A boolean indicating whether the user is currently in an IVS Stage.
- * - leaveStage: A function to leave the IVS Stage.
- * - participants: A Map of participants in the IVS Stage.
- */
 export default function useStage() {
   const [stageJoined, setStageJoined] = useState<boolean>(false)
-  const [participants, setParticipants] = useState<Map<string, StageParticipantInfo>>(new Map())
-  const [localParticipant, setLocalParticipant] = useState<StageParticipantInfo>()
+  const [participants, setParticipants] = useState(new Map())
+  const [localParticipant, setLocalParticipant] = useState<StageParticipantInfo | undefined>(undefined)
   const { currentVideoDevice, currentAudioDevice } = useLocalMediaContext()
 
   const stageRef = useRef<Stage | undefined>(undefined)
@@ -55,12 +47,7 @@ export default function useStage() {
     }
   }
 
-  /**
-   * Handle the event when media streams are added to a participant.
-   * @param participantInfo - Information about the participant with the added streams.
-   * @param streams - The streams that were added.
-   */
-  const handleMediaAdded = (participantInfo: StageParticipantInfo, streams: any): void => {
+  const handleMediaAdded = (participantInfo: StageParticipantInfo, streams: StageStream[]): void => {
     if (!isLocalParticipant(participantInfo)) {
       const { id } = participantInfo
       let participant = participants.get(id)
@@ -69,27 +56,17 @@ export default function useStage() {
     }
   }
 
-  /**
-   * Handle the event when media streams are removed from a participant.
-   * @param participantInfo - Information about the participant with the removed streams.
-   * @param streams - The streams that were removed.
-   */
-  const handleMediaRemoved = (participantInfo: any, streams: MediaStream[]): void => {
+  const handleMediaRemoved = (participantInfo: StageParticipantInfo, streams: StageStream[]): void => {
     if (!isLocalParticipant(participantInfo)) {
       const { id } = participantInfo
       let participant = participants.get(id)
-      const newStreams = participant.streams.filter((existingStream) => !streams.find((removedStream) => existingStream.id === removedStream.id))
+      const newStreams = participant.streams.filter((existingStream: any) => !streams.find((removedStream) => existingStream.id === removedStream.id))
       participant = { ...participant, streams: newStreams }
       setParticipants(new Map(participants.set(id, participant)))
     }
   }
 
-  /**
-   * Handle the event when the mute state of a participant's stream changes.
-   * @param participantInfo - Information about the participant whose stream's mute state changed.
-   * @param stream - The stream whose mute state changed.
-   */
-  const handleParticipantMuteChange = (participantInfo: StageParticipantInfo, stream: MediaStream): void => {
+  const handleParticipantMuteChange = (participantInfo: StageParticipantInfo, stream: StageStream): void => {
     if (!isLocalParticipant(participantInfo)) {
       const { id } = participantInfo
       let participant = participants.get(id)
@@ -98,10 +75,6 @@ export default function useStage() {
     }
   }
 
-  /**
-   * Handle the event when the connection state of the stage changes.
-   * @param state - The new connection state of the stage.
-   */
   const handleConnectionStateChange = (state: StageConnectionState): void => {
     if (state === StageConnectionState.CONNECTED) {
       setStageJoined(true)
@@ -110,20 +83,12 @@ export default function useStage() {
     }
   }
 
-  /**
-   * Leave the current stage.
-   */
   function leaveStage(): void {
     if (stageRef.current) {
       stageRef.current.leave()
     }
   }
 
-  /**
-   * Join an IVS Stage with the given token.
-   * @param token - The token for the stage to join.
-   * @returns A Promise that resolves when the join is complete.
-   */
   async function joinStage(token: string): Promise<void> {
     if (!token) {
       alert('Please enter a token to join a stage')

@@ -2,15 +2,16 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useLocalMediaContext } from '@/contexts/local-media-context'
-import useStage from '@/hooks/use-stage'
-import React, { useState } from 'react'
+import { LocalMediaContext } from '@/contexts/local-media-context'
+import { StageContext } from '@/contexts/stage-context'
+import { useContext, useState } from 'react'
 
-function MediaConfig() {
-  const { audioDevices, videoDevices } = useLocalMediaContext()
-  const { leaveStage, joinStage, stageJoined, screenshareStageJoined, unpublishScreenshare, publishScreenshare } = useStage()
+function MediaControl() {
   const [stageToken, setStageToken] = useState('')
   const [screenshareToken, setScreenshareToken] = useState('')
+
+  const { currentAudioDevice, currentVideoDevice, audioDevices, videoDevices, updateLocalAudio, updateLocalVideo } = useContext(LocalMediaContext)
+  const { joinStage, stageJoined, leaveStage, screenshareStageJoined, publishScreenshare, unpublishScreenshare } = useContext(StageContext)
 
   function joinOrLeaveStage() {
     if (stageJoined) {
@@ -38,7 +39,7 @@ function MediaConfig() {
           </div>
         </div>
         <div className="flex flex-col gap-2 justify-end">
-          <Button>Join</Button>
+          <Button onClick={() => joinOrLeaveStage()}>{stageJoined ? 'Leave' : 'Join'}</Button>
         </div>
       </div>
       <div className="grid grid-cols-2 gap-2">
@@ -49,14 +50,14 @@ function MediaConfig() {
           </div>
         </div>
         <div className="flex flex-col gap-2 justify-end">
-          <Button>Screenshare</Button>
+          <Button onClick={() => toggleScreenshare()}>{screenshareStageJoined ? 'Stop Screenshare' : 'Screenshare'}</Button>
         </div>
       </div>
       <div className="grid grid-cols-2 gap-2">
         <div className="flex flex-col gap-2 justify-end">
           <Label>Select Webcam</Label>
           <div>
-            <Select disabled={!videoDevices.length}>
+            <Select onValueChange={updateLocalVideo} disabled={!videoDevices.length}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select a device" />
               </SelectTrigger>
@@ -73,7 +74,7 @@ function MediaConfig() {
         <div className="flex flex-col gap-2 justify-end">
           <Label>Select Mic</Label>
           <div>
-            <Select disabled={!audioDevices.length}>
+            <Select onValueChange={updateLocalAudio} disabled={!audioDevices.length}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select a device" />
               </SelectTrigger>
@@ -92,4 +93,4 @@ function MediaConfig() {
   )
 }
 
-export default MediaConfig
+export default MediaControl

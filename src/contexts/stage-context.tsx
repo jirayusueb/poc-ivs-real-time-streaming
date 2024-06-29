@@ -1,33 +1,31 @@
 import useScreenshareStage from '@/hooks/use-screen-share-stage'
 import useStage from '@/hooks/use-stage'
-import { Stage, StageParticipantInfo } from 'amazon-ivs-web-broadcast'
-import React, { createContext, PropsWithChildren, useContext } from 'react'
+import { StageParticipantInfo } from 'amazon-ivs-web-broadcast'
+import { createContext, PropsWithChildren } from 'react'
 
-const defaultStageContext = {
-  joinStage: undefined,
-  participants: [],
-  stageConnected: false,
+interface StageContextState {
+  joinStage: (token: string) => Promise<void>
+  stageJoined: boolean
+  leaveStage: () => void
+  participants: Map<string, StageParticipantInfo>
+  screenshareStageJoined: boolean
+  publishScreenshare: (token: string) => Promise<void>
+  unpublishScreenshare: () => void
+  screenshareStageConnected: boolean
 }
 
-const defaultScreenshareStageContext = {
-  screenshareStage: undefined,
-  joinScreenshareStage: undefined,
+export const StageContext = createContext<StageContextState>({
+  joinStage: async () => {},
+  stageJoined: false,
+  leaveStage: () => {},
+  participants: new Map(),
+  screenshareStageJoined: false,
+  publishScreenshare: async () => {},
+  unpublishScreenshare: () => {},
   screenshareStageConnected: false,
-}
-
-export const StageContext = createContext({
-  ...defaultStageContext,
-  ...defaultScreenshareStageContext,
 })
 
-export const useStageContext = () => useContext(StageContext)
-
-/**
- * StageProvider component that provides the stage context to its children.
- * @param props - PropsWithChildren containing the children components.
- * @returns The StageContext.Provider component.
- */
-function StageProvider({ children }: PropsWithChildren<{}>): JSX.Element {
+function StageProvider({ children }: PropsWithChildren) {
   const { joinStage, stageJoined, leaveStage, participants } = useStage()
   const { publishScreenshare, unpublishScreenshare, screenshareStageJoined } = useScreenshareStage()
 
@@ -39,10 +37,7 @@ function StageProvider({ children }: PropsWithChildren<{}>): JSX.Element {
     screenshareStageJoined,
     publishScreenshare,
     unpublishScreenshare,
-    screenshareStage: undefined,
-    joinScreenshareStage: undefined,
     screenshareStageConnected: false,
-    stageConnected: false,
   }
 
   return <StageContext.Provider value={state}>{children}</StageContext.Provider>
