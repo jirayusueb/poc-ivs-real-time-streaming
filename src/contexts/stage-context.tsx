@@ -1,5 +1,6 @@
 import useScreenshareStage from '@/hooks/use-screen-share-stage'
 import useStage from '@/hooks/use-stage'
+import { StageParticipantInfoStream } from '@/types/amazon-ivs-web-broadcast'
 import { StageParticipantInfo } from 'amazon-ivs-web-broadcast'
 import { createContext, PropsWithChildren } from 'react'
 
@@ -7,7 +8,7 @@ interface StageContextState {
   joinStage: (token: string) => Promise<void>
   stageJoined: boolean
   leaveStage: () => void
-  participants: Map<string, StageParticipantInfo>
+  participants: Map<string, StageParticipantInfoStream>
   screenshareStageJoined: boolean
   publishScreenshare: (token: string) => Promise<void>
   unpublishScreenshare: () => void

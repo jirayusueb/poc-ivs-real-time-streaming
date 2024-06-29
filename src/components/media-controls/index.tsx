@@ -7,10 +7,12 @@ import { StageContext } from '@/contexts/stage-context'
 import { useContext, useState } from 'react'
 
 function MediaControl() {
-  const [stageToken, setStageToken] = useState('')
-  const [screenshareToken, setScreenshareToken] = useState('')
+  const cachedStageToken = sessionStorage.getItem('stage-token') || ''
+  const cachedScreenshareStageToken = sessionStorage.getItem('stage-screenshare-token') || ''
+  const [stageToken, setStageToken] = useState(cachedStageToken)
+  const [screenshareToken, setScreenshareToken] = useState(cachedScreenshareStageToken)
 
-  const { currentAudioDevice, currentVideoDevice, audioDevices, videoDevices, updateLocalAudio, updateLocalVideo } = useContext(LocalMediaContext)
+  const { audioDevices, videoDevices, updateLocalAudio, updateLocalVideo } = useContext(LocalMediaContext)
   const { joinStage, stageJoined, leaveStage, screenshareStageJoined, publishScreenshare, unpublishScreenshare } = useContext(StageContext)
 
   function joinOrLeaveStage() {

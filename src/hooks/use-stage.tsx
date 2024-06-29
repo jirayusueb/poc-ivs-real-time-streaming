@@ -1,11 +1,12 @@
 import { useLocalMediaContext } from '@/contexts/local-media-context'
+import { StageParticipantInfoStream } from '@/types/amazon-ivs-web-broadcast'
 import Strategy from '@/utils/strategy'
 import { Stage, StageConnectionState, StageEvents, StageParticipantInfo, StageStream } from 'amazon-ivs-web-broadcast'
 import { useEffect, useRef, useState } from 'react'
 
 export default function useStage() {
   const [stageJoined, setStageJoined] = useState<boolean>(false)
-  const [participants, setParticipants] = useState(new Map())
+  const [participants, setParticipants] = useState<Map<string, StageParticipantInfoStream>>(new Map())
   const [localParticipant, setLocalParticipant] = useState<StageParticipantInfo | undefined>(undefined)
   const { currentVideoDevice, currentAudioDevice } = useLocalMediaContext()
 
@@ -17,13 +18,14 @@ export default function useStage() {
     if (stageRef.current && stageJoined) {
       stageRef.current.refreshStrategy()
     }
-  }, [currentAudioDevice, currentVideoDevice])
+  }, [currentAudioDevice, currentVideoDevice, stageJoined])
 
   /**
    * Handle the event when a participant joins the stage.
    * @param participantInfo - Information about the participant that joined.
    */
   const handleParticipantJoin = (participantInfo: StageParticipantInfo): void => {
+    console.log('handleParticipantJoin', { participantInfo })
     if (isLocalParticipant(participantInfo)) {
       setLocalParticipant(participantInfo)
     } else {
@@ -38,6 +40,7 @@ export default function useStage() {
    * @param participantInfo - Information about the participant that left.
    */
   const handleParticipantLeave = (participantInfo: StageParticipantInfo): void => {
+    console.log('handleParticipantLeave', { participantInfo })
     if (isLocalParticipant(participantInfo)) {
       setLocalParticipant(undefined)
     } else {
@@ -48,18 +51,22 @@ export default function useStage() {
   }
 
   const handleMediaAdded = (participantInfo: StageParticipantInfo, streams: StageStream[]): void => {
-    if (!isLocalParticipant(participantInfo)) {
-      const { id } = participantInfo
-      let participant = participants.get(id)
+    console.log('handleMediaAdded', { participantInfo, streams })
+    const { id } = participantInfo
+    let participant = participants.get(id)
+
+    if (!isLocalParticipant(participantInfo) && participant) {
       participant = { ...participant, streams: [...streams, ...participant.streams] }
       setParticipants(new Map(participants.set(id, participant)))
     }
   }
 
   const handleMediaRemoved = (participantInfo: StageParticipantInfo, streams: StageStream[]): void => {
-    if (!isLocalParticipant(participantInfo)) {
-      const { id } = participantInfo
-      let participant = participants.get(id)
+    console.log('handleMediaRemoved', { participantInfo, streams })
+    const { id } = participantInfo
+    let participant = participants.get(id)
+
+    if (!isLocalParticipant(participantInfo) && participant) {
       const newStreams = participant.streams.filter((existingStream: any) => !streams.find((removedStream) => existingStream.id === removedStream.id))
       participant = { ...participant, streams: newStreams }
       setParticipants(new Map(participants.set(id, participant)))
@@ -67,15 +74,18 @@ export default function useStage() {
   }
 
   const handleParticipantMuteChange = (participantInfo: StageParticipantInfo, stream: StageStream): void => {
-    if (!isLocalParticipant(participantInfo)) {
-      const { id } = participantInfo
-      let participant = participants.get(id)
+    console.log('handleParticipantMuteChange', { participantInfo, stream })
+    const { id } = participantInfo
+    let participant = participants.get(id)
+
+    if (!isLocalParticipant(participantInfo) && participant) {
       participant = { ...participant, ...participantInfo }
       setParticipants(new Map(participants.set(id, participant)))
     }
   }
 
   const handleConnectionStateChange = (state: StageConnectionState): void => {
+    console.log('handleConnectionStateChange', { state })
     if (state === StageConnectionState.CONNECTED) {
       setStageJoined(true)
     } else if (state === StageConnectionState.DISCONNECTED) {
@@ -84,12 +94,14 @@ export default function useStage() {
   }
 
   function leaveStage(): void {
+    console.log('leaveStage')
     if (stageRef.current) {
       stageRef.current.leave()
     }
   }
 
   async function joinStage(token: string): Promise<void> {
+    console.log('joinStage')
     if (!token) {
       alert('Please enter a token to join a stage')
       return
@@ -119,7 +131,7 @@ export default function useStage() {
   return { joinStage, stageJoined, leaveStage, participants }
 }
 
-function createParticipant(participantInfo: StageParticipantInfo) {
+function createParticipant(participantInfo: StageParticipantInfo): StageParticipantInfoStream {
   return {
     ...participantInfo,
     streams: [],
