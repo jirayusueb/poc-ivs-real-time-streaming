@@ -1,7 +1,8 @@
+'use client'
+
 import useScreenshareStage from '@/hooks/use-screen-share-stage'
 import useStage from '@/hooks/use-stage'
 import { StageParticipantInfoStream } from '@/types/amazon-ivs-web-broadcast'
-import { StageParticipantInfo } from 'amazon-ivs-web-broadcast'
 import { createContext, PropsWithChildren } from 'react'
 
 interface StageContextState {

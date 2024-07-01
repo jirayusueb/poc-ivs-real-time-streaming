@@ -1,3 +1,5 @@
+'use client'
+
 import useLocalMedia from '@/hooks/use-local-media'
 import { getDevices } from '@/utils/media-device'
 import { LocalStageStream } from 'amazon-ivs-web-broadcast'
